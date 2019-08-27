@@ -1,0 +1,23 @@
+description: 'CNN'
+data_dir: '/global/project/projectdirs/dasrepo/vpa/atlas_cnn/data/RPVSusyData/'
+output_dir: '/global/project/projectdirs/dasrepo/vpa/atlas_cnn/results/'
+
+data:
+    name: cifar10
+
+model:
+    name: cnn
+    input_shape: [64, 64, 1]
+    n_classes: 10
+    dropout: 0.5
+
+optimizer:
+#     name: Adam
+    lr: 0.001
+
+training:
+    batch_size: 32
+    n_epochs: 50
+    lr_warmup_epochs: 0
+    loss: binary_crossentropy
+    metrics: [accuracy]
