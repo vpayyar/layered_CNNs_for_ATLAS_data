@@ -27,16 +27,7 @@ from tensorflow.keras.models import load_model
 from models import *
 from modules import *
 
-##### Stuff for GPU #####
-## special imports for setting keras and tensorflow variables.
-sys.path.insert(0,'/home/vpa/std_scripts/')
-from keras_tf_parallel_variables import configure_session
-### Set tensorflow and keras variables
-configure_session(intra_threads=32, inter_threads=2, blocktime=1, affinity='granularity=fine,compact,1,0')
-# Limit GPU usage to just one.
-#export CUDA_DEVICE_ORDER=PCI_BUS_ID
-#export CUDA_VISIBLE_DEVICES=1
-
+    
 
 
 
@@ -49,7 +40,7 @@ def parse_args():
     add_arg('--train','-tr',  action='store_false' ,dest='train_status' ,help='Has the model been trained?')
     add_arg('--test', '-ts',  action='store_false' ,dest='test_status'  ,help='Has the model been tested?')
     add_arg('-v', '--verbose', action='store_true')
-    add_arg('--gpu', type=int, help='specify a gpu device ID')    
+    add_arg('--gpu', type=str, choices=['None','maeve','cori'],default='None', help='Whether using gpu, if so, maeve or cori.')    
     add_arg('--model_list', '-mdlst', nargs='+', type=int, dest='mod_lst',help=' Enter the list of model numbers to test ', required=True)
 
     return parser.parse_args()
@@ -62,7 +53,19 @@ if __name__=='__main__':
     ## Note: --train means models needs to be trained. hence train_status=False
     train_status,test_status=args.train_status,args.test_status
     model_lst=args.mod_lst
-    
+    ##### Stuff for GPU #####
+    if args.gpu!='None': 
+        script_loc={'maeve':'/home/vpa/standard_scripts/','cori':'/global/u1/v/vpa/standard_scripts/'}
+        ## special imports for setting keras and tensorflow variables.
+        sys.path.insert(0,script_loc[args.gpu])
+        from keras_tf_parallel_variables import configure_session
+        ### Set tensorflow and keras variables
+        configure_session(intra_threads=32, inter_threads=2, blocktime=1, affinity='granularity=fine,compact,1,0')
+        # Limit GPU usage to just one.
+        #export CUDA_DEVICE_ORDER=PCI_BUS_ID
+        #export CUDA_VISIBLE_DEVICES=1
+
+
     t1=time.time()
     ### Read configuration ###
     config_file=args.config
