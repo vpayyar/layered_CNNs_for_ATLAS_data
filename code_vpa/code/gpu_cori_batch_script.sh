@@ -13,9 +13,9 @@
 echo "--start date" `date` `date +%s`
 echo '--hostname ' $HOSTNAME
 export HDF5_USE_FILE_LOCKING=FALSE
-# Limit to one GPU
-#export CUDA_DEVICE_ORDER=PCI_BUS_ID
-#export CUDA_VISIBLE_DEVICES=2
+module unload esslurm
+module load python 
+conda activate v_py3
 ### Actual script to run
 #echo $2
 python main.py --config config_cori.yaml --gpu cori --model_list 1 2

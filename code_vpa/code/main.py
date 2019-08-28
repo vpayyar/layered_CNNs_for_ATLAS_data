@@ -1,7 +1,6 @@
 # The main code for training a CNN on the ATLAS SUSY 2D images
 # Created by Venkitesh Ayyar. August 19, 2019
 
-
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
