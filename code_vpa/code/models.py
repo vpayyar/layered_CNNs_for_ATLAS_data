@@ -7,7 +7,7 @@ import tensorflow.keras.backend as K
 
 ### Import the modules for resnet50
 from resnet50 import *
-# from resnet18 import *
+from resnet18 import *
 
 ### Defining all the models tried in the study
 
@@ -69,6 +69,10 @@ def f_define_model(config_dict,name='1'):
         #learn_rate=0.00001
         resnet=True
 
+    elif name=='30': # Resnet 50
+        model = ResNet18(img_input=inputs)
+        #learn_rate=0.00001
+        resnet=True
     ## Add more models above
     ############################################
     ####### Compile model ######################

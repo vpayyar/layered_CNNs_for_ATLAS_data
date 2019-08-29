@@ -17,7 +17,5 @@ export HDF5_USE_FILE_LOCKING=FALSE
 export CUDA_DEVICE_ORDER=PCI_BUS_ID
 export CUDA_VISIBLE_DEVICES=2
 ### Actual script to run
-#echo $2
-python main.py --config config_maeve.yaml --model_list 1 2 20
-#python3 Cnn_train.py --typeofdata $1 --model_list $2
+python main.py --config config_maeve.yaml --model_list $1
 echo "--end date" `date` `date +%s`
