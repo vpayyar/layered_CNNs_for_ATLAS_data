@@ -3,10 +3,11 @@
 #SBATCH --nodes=1
 #SBATCH --time=04:00:00
 #SBATCH --qos=regular
-#SBATCH --job-name=ice_cube_cnn_train
+#SBATCH --job-name=atlas_cnn_train
 #SBATCH --output=slurm-%x-%j.out
 #SBATCH --constraint=gpu
 #SBATCH --account=nstaff
+#SBATCH --gres=gpu:1
 #################
 
 
