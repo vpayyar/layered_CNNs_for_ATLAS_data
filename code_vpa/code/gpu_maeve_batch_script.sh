@@ -17,5 +17,5 @@ export HDF5_USE_FILE_LOCKING=FALSE
 export CUDA_DEVICE_ORDER=PCI_BUS_ID
 export CUDA_VISIBLE_DEVICES=2
 ### Actual script to run
-python main.py --config config_maeve.yaml --model_list $1
+python main.py --train --config config_maeve.yaml --gpu maeve --model_list $1
 echo "--end date" `date` `date +%s`

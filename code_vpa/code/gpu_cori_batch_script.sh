@@ -18,5 +18,5 @@ module unload esslurm
 module load python 
 conda activate v_py3
 ### Actual script to run
-python main.py --config config_cori.yaml --gpu cori --model_list $1
+python main.py --train --config config_cori.yaml --gpu cori --model_list $1
 echo "--end date" `date` `date +%s`

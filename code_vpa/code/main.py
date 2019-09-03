@@ -36,8 +36,7 @@ def parse_args():
     add_arg = parser.add_argument
     
     add_arg('--config','-c', type=str, default='config.yaml',help='The .yaml file that stores the configuration.')
-    add_arg('--train','-tr',  action='store_false' ,dest='train_status' ,help='Has the model been trained?')
-    add_arg('--test', '-ts',  action='store_false' ,dest='test_status'  ,help='Has the model been tested?')
+    add_arg('--train','-tr',  action='store_true' ,dest='train' ,help='Has the model been trained?')
     add_arg('-v', '--verbose', action='store_true')
     add_arg('--gpu', type=str, choices=['None','maeve','cori'],default='None', help='Whether using gpu, if so, maeve or cori.')    
     add_arg('--model_list', '-mdlst', nargs='+', type=int, dest='mod_lst',help=' Enter the list of model numbers to test ', required=True)
@@ -50,7 +49,6 @@ if __name__=='__main__':
     args=parse_args()
     print(args)
     ## Note: --train means models needs to be trained. hence train_status=False
-    train_status,test_status=args.train_status,args.test_status
     model_lst=args.mod_lst
     ##### Stuff for GPU #####
     if args.gpu!='None': 
@@ -94,17 +92,44 @@ if __name__=='__main__':
     for i in model_lst:
         model_name=str(i)
         ### Compile model ###
-        fname_model,fname_history='mdl_{0}_weights.h5'.format(model_name),'history_{0}.pickle'.format(model_name)
-
+        fname_model,fname_history='model_{0}.h5'.format(model_name),'history_{0}.pickle'.format(model_name)
         ## Define model 
         model=f_define_model(config_dict,name=model_name)
+        
+        
+        
+        if args.train: # If model hasn't been trained, train and save files
+            
+            ### Train model ###
+            history=f_train_model(model,train_x,train_y,model_weights=fname_model,num_epochs=num_epochs,batch_size=batch_size)
 
-        ### Train model ###
-        history=f_train_model(model,train_x,train_y,model_weights=fname_model,num_epochs=num_epochs,batch_size=batch_size)
+            ### Save model and history ###
+            fname_model,fname_history='model_{0}.h5'.format(model_name),'history_{0}.pickle'.format(model_name)
 
-        ### Save model and history ###
-        fname_model,fname_history='model_{0}.h5'.format(model_name),'history_{0}.pickle'.format(model_name)
+            model.save(model_save_dir+fname_model)
+            with open(model_save_dir+fname_history, 'wb') as f:
+                pickle.dump(history, f)
 
-        model.save(model_save_dir+fname_model)
-        with open(model_save_dir+fname_history, 'wb') as f:
-            pickle.dump(history, f)
+                
+        else: # If using pre-trained model, check if files exist and load them.
+            print("Using trained model")
+            ### Read model and history
+
+            ### Check if files exist
+            assert os.path.exists(model_save_dir+fname_model),"Model not saved: %s"%(model_save_dir+fname_model)
+            assert os.path.exists(model_save_dir+fname_history),"History not saved"
+
+            model=load_model(model_save_dir+fname_model)
+            with open(model_save_dir+fname_history,'rb') as f:
+                history= pickle.load(f)
+
+            
+        #################################
+        ### Test model ###
+        test_x,test_y=test_data_dict['images'],test_data_dict['labels']
+        print(test_x.shape,test_y.shape)
+        
+        y_pred=f_test_model(model,test_x,test_y)   ### Prediction using model
+        
+        fname_ypred='ypred_{0}.test'.format(model_name)
+        np.savetxt(model_save_dir+fname_ypred,y_pred)
