@@ -61,8 +61,50 @@ def f_define_model(config_dict,name='1'):
         # Ouptut layer
         outputs = layers.Dense(1, activation='sigmoid')(h)
 
+    elif name=='3':
+        conv_sizes=[20,20,20,20]
+        conv_args = dict(kernel_size=(3, 3), activation='relu', padding='same')
+        for conv_size in conv_sizes:
+            h = layers.Conv2D(conv_size, **conv_args)(h)
+            h = layers.MaxPooling2D(pool_size=(2, 2))(h)
+        h = layers.Flatten()(h)
 
+        # Fully connected  layers
+        h = layers.Dense(64, activation='relu')(h)
+        h = layers.Dropout(rate=dropout)(h)
 
+        # Ouptut layer
+        outputs = layers.Dense(1, activation='sigmoid')(h)
+        
+    elif name=='4':
+        conv_sizes=[10,10,10]
+        conv_args = dict(kernel_size=(3, 3), activation='relu', padding='same')
+        for conv_size in conv_sizes:
+            h = layers.Conv2D(conv_size, **conv_args)(h)
+            h = layers.MaxPooling2D(pool_size=(4, 4))(h)
+        h = layers.Flatten()(h)
+
+        # Fully connected  layers
+        h = layers.Dense(64, activation='relu')(h)
+        h = layers.Dropout(rate=dropout)(h)
+
+        # Ouptut layer
+        outputs = layers.Dense(1, activation='sigmoid')(h)
+        
+    elif name=='5':
+        conv_sizes=[10,10,10]
+        conv_args = dict(kernel_size=(4, 4), activation='relu', padding='same')
+        for conv_size in conv_sizes:
+            h = layers.Conv2D(conv_size, **conv_args)(h)
+            h = layers.MaxPooling2D(pool_size=(4, 4))(h)
+        h = layers.Flatten()(h)
+
+        # Fully connected  layers
+        h = layers.Dense(64, activation='relu')(h)
+        h = layers.Dropout(rate=dropout)(h)
+
+        # Ouptut layer
+        outputs = layers.Dense(1, activation='sigmoid')(h)
 
     elif name=='20': # Resnet 50
         model = ResNet50(img_input=inputs)
