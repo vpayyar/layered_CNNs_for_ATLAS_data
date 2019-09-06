@@ -33,8 +33,8 @@ def f_get_data(filename):
         print("Name of file",filename)
         raise SystemError
 
-    idx=50000
-    #idx=None
+    #idx=50000
+    idx=None
     images = np.expand_dims(hf['all_events']['hist'][:idx], -1)
     labels = hf['all_events']['y'][:idx]
     weights = hf['all_events']['weight'][:idx]
