@@ -95,6 +95,7 @@ def f_define_model(config_dict,name='1'):
         outputs = layers.Dense(1, activation='sigmoid')(h)
         
     elif name=='20': # Resnet 50
+        inputs = layers.Input(shape=shape)
         model = ResNet50(img_input=inputs)
         #learn_rate=0.00001
         resnet=True
