@@ -101,7 +101,7 @@ if __name__=='__main__':
         if args.train: # If model hasn't been trained, train and save files
             
             ### Train model ###
-            history=f_train_model(model,train_x,train_y,model_weights=fname_model,num_epochs=num_epochs,batch_size=batch_size)
+            history=f_train_model(model,train_x,train_y,model_weights=model_save_dir+fname_model,num_epochs=num_epochs,batch_size=batch_size)
 
             ### Save model and history ###
             fname_model,fname_history='model_{0}.h5'.format(model_name),'history_{0}.pickle'.format(model_name)
