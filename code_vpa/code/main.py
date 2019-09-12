@@ -13,7 +13,6 @@ import subprocess as sp
 import pickle
 import yaml
 
-
 ## M-L modules
 import tensorflow.keras
 from tensorflow.keras import layers, models, optimizers, callbacks  # or tensorflow.keras as keras
@@ -25,10 +24,6 @@ from tensorflow.keras.models import load_model
 ## modules from other files
 from models import *
 from modules import *
-
-    
-
-
 
 def parse_args():
     """Parse command line arguments."""
@@ -58,50 +53,44 @@ if __name__=='__main__':
         from keras_tf_parallel_variables import configure_session
         ### Set tensorflow and keras variables
         configure_session(intra_threads=32, inter_threads=2, blocktime=1, affinity='granularity=fine,compact,1,0')
-        # Limit GPU usage to just one.
-        #export CUDA_DEVICE_ORDER=PCI_BUS_ID
-        #export CUDA_VISIBLE_DEVICES=1
-
-
+    
     t1=time.time()
     ### Read configuration ###
     config_file=args.config
     config_dict=f_load_config(config_file)
     print(config_dict)
-
+    
     batch_size=config_dict['training']['batch_size']
     num_epochs=config_dict['training']['n_epochs']
-
+    
     ### Extract the training and validation data ###
     data_dir=config_dict['data_dir']
     #### Training data
     filename=data_dir+'train.h5'
     train_data_dict=f_get_data(filename)
-
-    #### Test_data
-    filename=data_dir+'val.h5'
-    test_data_dict=f_get_data(filename)
-
+    
     train_x,train_y,train_wts=train_data_dict['images'],train_data_dict['labels'],train_data_dict['weights']
-    print(train_x.shape,train_y.shape,train_wts.shape)
+    #print("Train data shape",train_x.shape,train_y.shape,train_wts.shape)
+
     t2=time.time()
     print("Time taken to read files",t2-t1)
-
+    
     model_save_dir=config_dict['output_dir']
     
     for i in model_lst:
         model_name=str(i)
+
         ### Compile model ###
-        fname_model,fname_history='model_{0}.h5'.format(model_name),'history_{0}.pickle'.format(model_name)
-        ## Define model 
+        # Declare names of files for storing model, model weights, history
+        fname_model,fname_model_wts,fname_history='model_{0}.h5'.format(model_name),'model_wts_{0}.h5'.format(model_name),'history_{0}.pickle'.format(model_name)
+
+        ### Define model 
         model=f_define_model(config_dict,name=model_name)
-        
-        
         
         if args.train: # If model hasn't been trained, train and save files
             
             ### Train model ###
-            history=f_train_model(model,train_x,train_y,model_weights=model_save_dir+fname_model,num_epochs=num_epochs,batch_size=batch_size)
+            history=f_train_model(model,train_x,train_y,model_weights=model_save_dir+fname_model_wts,num_epochs=num_epochs,batch_size=batch_size)
  
             ### Save model and history ###
             fname_model,fname_history='model_{0}.h5'.format(model_name),'history_{0}.pickle'.format(model_name)
@@ -109,13 +98,12 @@ if __name__=='__main__':
             model.save(model_save_dir+fname_model)
             with open(model_save_dir+fname_history, 'wb') as f:
                 pickle.dump(history, f)
-
-                
+         
         else: # If using pre-trained model, check if files exist and load them.
             print("Using trained model")
             ### Read model and history
 
-            ### Check if files exist
+            ## Check if files exist
             assert os.path.exists(model_save_dir+fname_model),"Model not saved: %s"%(model_save_dir+fname_model)
             assert os.path.exists(model_save_dir+fname_history),"History not saved"
 
@@ -123,13 +111,19 @@ if __name__=='__main__':
             with open(model_save_dir+fname_history,'rb') as f:
                 history= pickle.load(f)
 
-            
         #################################
         ### Test model ###
+
+        ## Read Test_data
+        filename=data_dir+'val.h5'
+        test_data_dict=f_get_data(filename)
+
         test_x,test_y=test_data_dict['images'],test_data_dict['labels']
-        print(test_x.shape,test_y.shape)
+        #print("Test data shape",test_x.shape,test_y.shape)
         
         y_pred=f_test_model(model,test_x,test_y)   ### Prediction using model
-        
+
+        ## Save the predictions on test data for the labels, for roc curve
         fname_ypred='ypred_{0}.test'.format(model_name)
         np.savetxt(model_save_dir+fname_ypred,y_pred)
+

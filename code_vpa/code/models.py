@@ -24,6 +24,7 @@ def f_model_prototype(shape,dropout,**model_dict):
     conv_args = dict(kernel_size=model_dict['kernel_size'], activation='relu', padding='same')
     for conv_size in conv_sizes:
         h = layers.Conv2D(conv_size, **conv_args)(h)
+        if model_dict['double_conf']:  h = layers.Conv2D(conv_size, **conv_args)(h)
         h = layers.MaxPooling2D(pool_size=model_dict['pool_size'])(h)
         ## inner_dropout is None or a float
         if model_dict['inner_dropout']!=None: h = layers.Dropout(rate=model_dict['inner_dropout'])(h)
@@ -54,37 +55,70 @@ def f_define_model(config_dict,name='1'):
     # Choose model
     if name=='1':
         model_par_dict={'conv_size_list':[10,10,10],'kernel_size':(3,3),'pool_size':(2,2),
-        'inner_dropout':0.1,'dense_size':64,'final_activation':'sigmoid'} 
+                'inner_dropout':0.1,'dense_size':64,'final_activation':'sigmoid','double_conf':False} 
         
     elif name=='2':
         model_par_dict={'conv_size_list':[10,10,10],'kernel_size':(3,3),'pool_size':(2,2),
-        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid'} 
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conf':False} 
 
     elif name=='3':
         model_par_dict={'conv_size_list':[20,20,20,20],'kernel_size':(3,3),'pool_size':(2,2),
-        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid'} 
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conf':False} 
         
     elif name=='4':
-        model_par_dict={'conv_size_list':[10,10,10],'kernel_size':(3,3),'pool_size':(4,4),
-        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid'}
-        
+        model_par_dict={'conv_size_list':[30,30,30,30,40],'kernel_size':(3,3),'pool_size':(2,2),
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conf':False} 
+
     elif name=='5':
-        model_par_dict={'conv_size_list':[10,10,10],'kernel_size':(4,4),'pool_size':(4,4),
-        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid'} 
-    
-    ### A custom layered cnn is name=0
+        model_par_dict={'conv_size_list':[30,30,30,30,40],'kernel_size':(3,3),'pool_size':(2,2),
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conf':False} 
+
+    elif name=='6':
+        model_par_dict={'conv_size_list':[128,128,128,128,128],'kernel_size':(3,3),'pool_size':(2,2),
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conf':False} 
+
+    elif name=='7':
+        model_par_dict={'conv_size_list':[80,80,80,80,80],'kernel_size':(3,3),'pool_size':(2,2),
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conf':False} 
+
+    elif name=='8':
+        model_par_dict={'conv_size_list':[256,256,256],'kernel_size':(3,3),'pool_size':(4,4),
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conf':False}
+      
+    elif name=='9':
+        model_par_dict={'conv_size_list':[60,60],'kernel_size':(3,3),'pool_size':(4,4),
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conf':False}
+      
+    elif name=='10':
+        model_par_dict={'conv_size_list':[128,256,256],'kernel_size':(3,3),'pool_size':(4,4),
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conf':False}
+      
+    elif name=='11':
+        model_par_dict={'conv_size_list':[10,10,10],'kernel_size':(3,3),'pool_size':(2,2),
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conf':True}
+    elif name=='12':
+        model_par_dict={'conv_size_list':[64,64,64,64],'kernel_size':(3,3),'pool_size':(2,2),
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conf':True}
+    elif name=='13':
+        model_par_dict={'conv_size_list':[128,128,128,128],'kernel_size':(3,3),'pool_size':(2,2),
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conf':True}
+
+     ### A custom layered cnn is name=0
     elif name=='0': 
         custom_model=True
         
         inputs = layers.Input(shape=shape)
         h = inputs
         # Convolutional layers        
-        conv_sizes=[10,10,10]
+        conv_sizes=[128,128,256]
         conv_args = dict(kernel_size=(4, 4), activation='relu', padding='same')
         for conv_size in conv_sizes:
             h = layers.Conv2D(conv_size, **conv_args)(h)
-            h = layers.MaxPooling2D(pool_size=(4, 4))(h)
-            h = layers.Dropout(rate=dropout)(h)
+            h = layers.Conv2D(conv_size, **conv_args)(h)
+            h = layers.Conv2D(conv_size, **conv_args)(h)
+            h = layers.Conv2D(conv_size, **conv_args)(h)
+            h = layers.MaxPooling2D(pool_size=(2, 2))(h)
+            #h = layers.Dropout(rate=dropout)(h)
 
         h = layers.Flatten()(h)
         # Fully connected  layers
@@ -97,13 +131,13 @@ def f_define_model(config_dict,name='1'):
     elif name=='20': # Resnet 50
         inputs = layers.Input(shape=shape)
         model = ResNet50(img_input=inputs)
-        #learn_rate=0.00001
+        learn_rate=0.0001
         resnet=True
 
     elif name=='30': # Resnet 50
         inputs = layers.Input(shape=shape)
         model = ResNet18(img_input=inputs)
-        #learn_rate=0.00001
+        learn_rate=0.0001
         resnet=True
     ## Add more models above
     ############################################
