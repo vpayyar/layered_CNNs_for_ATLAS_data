@@ -150,7 +150,7 @@ def f_define_model(config_dict,name='1'):
         inputs = layers.Input(shape=shape)
         h = inputs
         # Convolutional layers
-        h = Conv2D(64, kernel_size=(3, 3), activation='relu', strides=1, padding='same')(x)
+        h = Conv2D(64, kernel_size=(3, 3), activation='relu', strides=1, padding='same')(h)
         h = Conv2D(128, kernel_size=(3, 3), activation='relu', strides=2, padding='same')(h)
         h = Conv2D(256, kernel_size=(3, 3), activation='relu', strides=1, padding='same')(h)
         h = Conv2D(256, kernel_size=(3, 3), activation='relu', strides=2, padding='same')(h)
@@ -167,7 +167,8 @@ def f_define_model(config_dict,name='1'):
         opt,loss_fn=optimizers.Adam(lr=learn_rate),'sparse_categorical_crossentropy'
     
     else : ## For non resnet models 
-        if name!='0':     outputs,inputs=f_model_prototype(shape,dropout,**model_par_dict)
+        if name not in ['0','30']:  ### For non-custom models, use prototype function
+            outputs,inputs=f_model_prototype(shape,dropout,**model_par_dict)
             
         model = models.Model(inputs, outputs)
         opt=optimizers.Adam(lr=learn_rate)
