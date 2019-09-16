@@ -109,7 +109,7 @@ def f_define_model(config_dict,name='1'):
         
         inputs = layers.Input(shape=shape)
         h = inputs
-        # Convolutional layers        
+        # Convolutional layers     
         conv_sizes=[128,128,256]
         conv_args = dict(kernel_size=(4, 4), activation='relu', padding='same')
         for conv_size in conv_sizes:
@@ -134,7 +134,7 @@ def f_define_model(config_dict,name='1'):
         learn_rate=0.0001
         resnet=True
 
-    elif name=='30': # Resnet 50
+    elif name=='21': # Resnet 50
         inputs = layers.Input(shape=shape)
         model = ResNet18(img_input=inputs)
         learn_rate=0.0001
@@ -144,6 +144,23 @@ def f_define_model(config_dict,name='1'):
     ####### Compile model ######################
     ############################################
 
+    elif name=='30': 
+        custom_model=True
+        
+        inputs = layers.Input(shape=shape)
+        h = inputs
+        # Convolutional layers
+        h = Conv2D(64, kernel_size=(3, 3), activation='relu', strides=1, padding='same')(x)
+        h = Conv2D(128, kernel_size=(3, 3), activation='relu', strides=2, padding='same')(h)
+        h = Conv2D(256, kernel_size=(3, 3), activation='relu', strides=1, padding='same')(h)
+        h = Conv2D(256, kernel_size=(3, 3), activation='relu', strides=2, padding='same')(h)
+        h = Flatten()(h)
+        h = Dense(512, activation='relu')(h)
+        y = Dense(1, activation='sigmoid')(h)
+
+        # Ouptut layer
+        outputs = layers.Dense(1, activation='sigmoid')(h)
+    
     
     if resnet:
         print("resnet model name",name)
