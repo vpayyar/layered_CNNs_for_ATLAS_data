@@ -3,3 +3,4 @@ code_vpa/code/saved_data/
 code_vpa/jpt_notebooks/.ipynb*
 slurm*.out
 __pycache__
+*/.ipynb_checkpoints
