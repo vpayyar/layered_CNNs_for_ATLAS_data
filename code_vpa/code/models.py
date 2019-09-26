@@ -21,11 +21,17 @@ def f_model_prototype(shape,dropout,**model_dict):
     h = inputs
     # Convolutional layers
     conv_sizes=model_dict['conv_size_list'] # Eg. [10,10,10]
-    conv_args = dict(kernel_size=model_dict['kernel_size'], activation='relu', padding='same')
-    for conv_size in conv_sizes:
-        h = layers.Conv2D(conv_size, **conv_args)(h)
-        if model_dict['double_conf']:  h = layers.Conv2D(conv_size, **conv_args)(h)
-        h = layers.MaxPooling2D(pool_size=model_dict['pool_size'])(h)
+    if model_dict['strides']==1: 
+        stride_lst=[1]*len(conv_sizes) # Default stride is 1 for each convolution.
+    else : 
+        stride_lst=model_dict['strides']
+    
+    conv_args = dict(kernel_size=model_dict['kernel_size'], activation='relu', 'padding='same')
+    
+    for conv_size,strd in zip(conv_sizes,stride_lst):
+        h = layers.Conv2D(conv_size, strides=strd, **conv_args)(h)
+        if model_dict['double_conv']:  h = layers.Conv2D(conv_size,strides=strd **conv_args)(h)
+        if not model_dict['no_pool']: h = layers.MaxPooling2D(pool_size=model_dict['pool_size'])(h)
         ## inner_dropout is None or a float
         if model_dict['inner_dropout']!=None: h = layers.Dropout(rate=model_dict['inner_dropout'])(h)
     h = layers.Flatten()(h)
@@ -54,55 +60,65 @@ def f_define_model(config_dict,name='1'):
     
     # Choose model
     if name=='1':
-        model_par_dict={'conv_size_list':[10,10,10],'kernel_size':(3,3),'pool_size':(2,2),
-                'inner_dropout':0.1,'dense_size':64,'final_activation':'sigmoid','double_conf':False} 
+        model_par_dict={'conv_size_list':[10,10,10],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False,
+                'inner_dropout':0.1,'dense_size':64,'final_activation':'sigmoid','double_conv':False} 
         
     elif name=='2':
-        model_par_dict={'conv_size_list':[10,10,10],'kernel_size':(3,3),'pool_size':(2,2),
-        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conf':False} 
+        model_par_dict={'conv_size_list':[10,10,10],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False,
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':False} 
 
     elif name=='3':
-        model_par_dict={'conv_size_list':[20,20,20,20],'kernel_size':(3,3),'pool_size':(2,2),
-        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conf':False} 
+        model_par_dict={'conv_size_list':[20,20,20,20],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False,
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':False} 
         
     elif name=='4':
-        model_par_dict={'conv_size_list':[30,30,30,30,40],'kernel_size':(3,3),'pool_size':(2,2),
-        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conf':False} 
+        model_par_dict={'conv_size_list':[30,30,30,30,40],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False,
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':False} 
 
     elif name=='5':
-        model_par_dict={'conv_size_list':[30,30,30,30,40],'kernel_size':(3,3),'pool_size':(2,2),
-        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conf':False} 
+        model_par_dict={'conv_size_list':[30,30,30,30,40],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False,
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':False} 
 
     elif name=='6':
-        model_par_dict={'conv_size_list':[128,128,128,128,128],'kernel_size':(3,3),'pool_size':(2,2),
-        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conf':False} 
+        model_par_dict={'conv_size_list':[128,128,128,128,128],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False,
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':False} 
 
     elif name=='7':
-        model_par_dict={'conv_size_list':[80,80,80,80,80],'kernel_size':(3,3),'pool_size':(2,2),
-        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conf':False} 
+        model_par_dict={'conv_size_list':[80,80,80,80,80],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False,
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':False} 
 
     elif name=='8':
-        model_par_dict={'conv_size_list':[256,256,256],'kernel_size':(3,3),'pool_size':(4,4),
-        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conf':False}
+        model_par_dict={'conv_size_list':[256,256,256],'kernel_size':(3,3),'pool_size':(4,4), 'strides':1, 'no_pool':False,
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':False}
       
     elif name=='9':
-        model_par_dict={'conv_size_list':[60,60],'kernel_size':(3,3),'pool_size':(4,4),
-        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conf':False}
+        model_par_dict={'conv_size_list':[60,60],'kernel_size':(3,3),'pool_size':(4,4), 'strides':1, 'no_pool':False,
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':False}
       
     elif name=='10':
-        model_par_dict={'conv_size_list':[128,256,256],'kernel_size':(3,3),'pool_size':(4,4),
-        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conf':False}
+        model_par_dict={'conv_size_list':[128,256,256],'kernel_size':(3,3),'pool_size':(4,4), 'strides':1, 'no_pool':False,
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':False}
       
     elif name=='11':
-        model_par_dict={'conv_size_list':[10,10,10],'kernel_size':(3,3),'pool_size':(2,2),
-        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conf':True}
+        model_par_dict={'conv_size_list':[10,10,10],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False,
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':True}
     elif name=='12':
-        model_par_dict={'conv_size_list':[64,64,64,64],'kernel_size':(3,3),'pool_size':(2,2),
-        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conf':True}
+        model_par_dict={'conv_size_list':[64,64,64,64],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False,
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':True}
     elif name=='13':
-        model_par_dict={'conv_size_list':[128,128,128,128],'kernel_size':(3,3),'pool_size':(2,2),
-        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conf':True}
+        model_par_dict={'conv_size_list':[128,128,128,128],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False,
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':True}
 
+    ### Strides instead of pools
+    elif name=='14':
+        model_par_dict={'conv_size_list':[128,128,128,128],'kernel_size':(3,3),'pool_size':(2,2), 'strides':[1,2,2,1], 'no_pool':True,
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':True}
+        
+    elif name=='15':
+        model_par_dict={'conv_size_list':[128,128,128,128],'kernel_size':(3,3),'pool_size':(2,2), 'strides':[1,2,3,1], 'no_pool':True,
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':True}
+        
+    
      ### A custom layered cnn is name=0
     elif name=='0': 
         custom_model=True
