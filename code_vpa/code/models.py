@@ -12,11 +12,12 @@ from resnet18 import *
 ### Defining all the models tried in the study
 
 
-def f_model_prototype(shape,dropout,**model_dict):
+def f_model_prototype(shape,**model_dict):
     '''
     General prototype for layered CNNs
     '''
-    
+   
+    activ='relu' # activation
     inputs = layers.Input(shape=shape)
     h = inputs
     # Convolutional layers
@@ -26,7 +27,7 @@ def f_model_prototype(shape,dropout,**model_dict):
     else : 
         stride_lst=model_dict['strides']
     
-    conv_args = dict(kernel_size=model_dict['kernel_size'], activation='relu', padding='same')
+    conv_args = dict(kernel_size=model_dict['kernel_size'], activation=activ, padding='same')
     
     for conv_size,strd in zip(conv_sizes,stride_lst):
         h = layers.Conv2D(conv_size, strides=strd, **conv_args)(h)
@@ -37,8 +38,9 @@ def f_model_prototype(shape,dropout,**model_dict):
     h = layers.Flatten()(h)
 
     # Fully connected  layers
-    h = layers.Dense(model_dict['dense_size'], activation='relu')(h)
-    h = layers.Dropout(rate=dropout)(h)
+    if model_dict['outer_dropout']!=None: h = layers.Dropout(rate=model_dict['outer_dropout'])(h)
+    h = layers.Dense(model_dict['dense_size'], activation=activ)(h)
+
 
     # Ouptut layer
     outputs = layers.Dense(1, activation=model_dict['final_activation'])(h)    
@@ -50,75 +52,75 @@ def f_define_model(config_dict,name='1'):
     '''
     ### Extract info from the config_dict
     shape=config_dict['model']['input_shape']
-    learn_rate=config_dict['optimizer']['lr']
     loss_fn=config_dict['training']['loss']
     metrics=config_dict['training']['metrics']
-    dropout=config_dict['model']['dropout']
     
-
     resnet=False ### Variable storing whether the models is resnet or not. This is needed for specifying the loss function.    
     
     # Choose model
     if name=='1':
-        model_par_dict={'conv_size_list':[10,10,10],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False,
+        model_par_dict={'conv_size_list':[10,10,10],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False, 'learn_rate':0.001, 'outer_dropout':0.5,
                 'inner_dropout':0.1,'dense_size':64,'final_activation':'sigmoid','double_conv':False} 
         
     elif name=='2':
-        model_par_dict={'conv_size_list':[10,10,10],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False,
+        model_par_dict={'conv_size_list':[10,10,10],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False, 'learn_rate':0.001, 'outer_dropout':0.5,
         'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':False} 
 
     elif name=='3':
-        model_par_dict={'conv_size_list':[20,20,20,20],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False,
+        model_par_dict={'conv_size_list':[20,20,20,20],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False, 'learn_rate':0.001, 'outer_dropout':None,
         'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':False} 
         
     elif name=='4':
-        model_par_dict={'conv_size_list':[30,30,30,30,40],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False,
+        model_par_dict={'conv_size_list':[30,30,30,30,40],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False, 'learn_rate':0.001, 'outer_dropout':None,
         'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':False} 
 
     elif name=='5':
-        model_par_dict={'conv_size_list':[30,30,30,30,40],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False,
+        model_par_dict={'conv_size_list':[30,30,30,30,40],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False, 'learn_rate':0.001, 'outer_dropout':None,
         'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':False} 
 
     elif name=='6':
-        model_par_dict={'conv_size_list':[128,128,128,128,128],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False,
+        model_par_dict={'conv_size_list':[128,128,128,128,128],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False, 'learn_rate':0.001, 'outer_dropout':None,
         'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':False} 
 
     elif name=='7':
-        model_par_dict={'conv_size_list':[80,80,80,80,80],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False,
+        model_par_dict={'conv_size_list':[80,80,80,80,80],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False, 'learn_rate':0.001, 'outer_dropout':None,
         'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':False} 
 
     elif name=='8':
-        model_par_dict={'conv_size_list':[256,256,256],'kernel_size':(3,3),'pool_size':(4,4), 'strides':1, 'no_pool':False,
+        model_par_dict={'conv_size_list':[256,256,256],'kernel_size':(3,3),'pool_size':(4,4), 'strides':1, 'no_pool':False, 'learn_rate':0.001, 'outer_dropout':None,
         'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':False}
       
     elif name=='9':
-        model_par_dict={'conv_size_list':[60,60],'kernel_size':(3,3),'pool_size':(4,4), 'strides':1, 'no_pool':False,
+        model_par_dict={'conv_size_list':[60,60],'kernel_size':(3,3),'pool_size':(4,4), 'strides':1, 'no_pool':False, 'learn_rate':0.001, 'outer_dropout':None,
         'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':False}
       
     elif name=='10':
-        model_par_dict={'conv_size_list':[128,256,256],'kernel_size':(3,3),'pool_size':(4,4), 'strides':1, 'no_pool':False,
+        model_par_dict={'conv_size_list':[128,256,256],'kernel_size':(3,3),'pool_size':(4,4), 'strides':1, 'no_pool':False, 'learn_rate':0.001, 'outer_dropout':None,
         'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':False}
       
     elif name=='11':
-        model_par_dict={'conv_size_list':[10,10,10],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False,
+        model_par_dict={'conv_size_list':[10,10,10],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False, 'learn_rate':0.001, 'outer_dropout':None,
         'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':True}
     elif name=='12':
-        model_par_dict={'conv_size_list':[64,64,64,64],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False,
+        model_par_dict={'conv_size_list':[64,64,64,64],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False, 'learn_rate':0.001, 'outer_dropout':None,
         'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':True}
     elif name=='13':
-        model_par_dict={'conv_size_list':[128,128,128,128],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False,
+        model_par_dict={'conv_size_list':[128,128,128,128],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False, 'learn_rate':0.001, 'outer_dropout':None,
         'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':True}
 
     ### Strides instead of pools
     elif name=='14':
-        model_par_dict={'conv_size_list':[128,128,128,128],'kernel_size':(3,3),'pool_size':(2,2), 'strides':[1,2,2,1], 'no_pool':True,
+        model_par_dict={'conv_size_list':[128,128,128,128],'kernel_size':(3,3),'pool_size':(2,2), 'strides':[1,2,2,1], 'no_pool':True, 'learn_rate':0.001, 'outer_dropout':0.5,
         'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':True}
         
     elif name=='15':
-        model_par_dict={'conv_size_list':[128,128,128,128],'kernel_size':(3,3),'pool_size':(2,2), 'strides':[1,2,3,1], 'no_pool':True,
-        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':True}
+        model_par_dict={'conv_size_list':[128,128,256,256],'kernel_size':(3,3),'pool_size':(2,2), 'strides':[1,2,3,1], 'no_pool':True, 'learn_rate':0.001, 'outer_dropout':0.8,
+        'inner_dropout':0.5,'dense_size':64,'final_activation':'sigmoid','double_conv':True}
         
-    
+    elif name=='16':
+        model_par_dict={'conv_size_list':[128,128,64,64],'kernel_size':(3,3),'pool_size':(2,2), 'strides':[1,2,3,4], 'no_pool':True, 'learn_rate':0.001, 'outer_dropout':0.2,
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':True}
+     
      ### A custom layered cnn is name=0
     elif name=='0': 
         custom_model=True
@@ -134,12 +136,12 @@ def f_define_model(config_dict,name='1'):
             h = layers.Conv2D(conv_size, **conv_args)(h)
             h = layers.Conv2D(conv_size, **conv_args)(h)
             h = layers.MaxPooling2D(pool_size=(2, 2))(h)
-            #h = layers.Dropout(rate=dropout)(h)
+            #h = layers.Dropout(rate=0.5)(h)
 
         h = layers.Flatten()(h)
         # Fully connected  layers
         h = layers.Dense(64, activation='relu')(h)
-        h = layers.Dropout(rate=dropout)(h)
+        h = layers.Dropout(rate=0.5)(h)
 
         # Ouptut layer
         outputs = layers.Dense(1, activation='sigmoid')(h)
@@ -155,12 +157,8 @@ def f_define_model(config_dict,name='1'):
         model = ResNet18(img_input=inputs)
         learn_rate=0.0001
         resnet=True
-    ## Add more models above
-    ############################################
-    ####### Compile model ######################
-    ############################################
 
-    elif name=='30': 
+    elif name=='30':  # Model used in ATLAS paper
         custom_model=True
         
         inputs = layers.Input(shape=shape)
@@ -177,15 +175,21 @@ def f_define_model(config_dict,name='1'):
         # Ouptut layer
         outputs = layers.Dense(1, activation='sigmoid')(h)
     
-    
+
+    ############################################
+    ### Add more models above
+    ############################################
+    ####### Compile model ######################
+    ############################################
+
     if resnet:
         print("resnet model name",name)
         opt,loss_fn=optimizers.Adam(lr=learn_rate),'sparse_categorical_crossentropy'
     
     else : ## For non resnet models 
         if name not in ['0','30']:  ### For non-custom models, use prototype function
-            outputs,inputs=f_model_prototype(shape,dropout,**model_par_dict)
-            
+            outputs,inputs=f_model_prototype(shape,**model_par_dict)
+            learn_rate=model_par_dict['learn_rate']    
         model = models.Model(inputs, outputs)
         opt=optimizers.Adam(lr=learn_rate)
     
