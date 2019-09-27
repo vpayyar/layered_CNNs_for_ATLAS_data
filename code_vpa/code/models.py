@@ -26,11 +26,11 @@ def f_model_prototype(shape,dropout,**model_dict):
     else : 
         stride_lst=model_dict['strides']
     
-    conv_args = dict(kernel_size=model_dict['kernel_size'], activation='relu', 'padding='same')
+    conv_args = dict(kernel_size=model_dict['kernel_size'], activation='relu', padding='same')
     
     for conv_size,strd in zip(conv_sizes,stride_lst):
         h = layers.Conv2D(conv_size, strides=strd, **conv_args)(h)
-        if model_dict['double_conv']:  h = layers.Conv2D(conv_size,strides=strd **conv_args)(h)
+        if model_dict['double_conv']:  h = layers.Conv2D(conv_size,strides=strd, **conv_args)(h)
         if not model_dict['no_pool']: h = layers.MaxPooling2D(pool_size=model_dict['pool_size'])(h)
         ## inner_dropout is None or a float
         if model_dict['inner_dropout']!=None: h = layers.Dropout(rate=model_dict['inner_dropout'])(h)
