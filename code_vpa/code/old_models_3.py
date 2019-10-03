@@ -56,35 +56,60 @@ def f_define_model(config_dict,name='1'):
     metrics=config_dict['training']['metrics']
     
     resnet=False ### Variable storing whether the models is resnet or not. This is needed for specifying the loss function.    
-    custom_model=False ### Variable storing whether the models is a layer-by-layer build code (not using the protytype function).    
+    
     # Choose model
-    if name=='1': # Simple layered, with inner dropout
+    if name=='1':
         model_par_dict={'conv_size_list':[10,10,10],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False, 'learn_rate':0.001, 'outer_dropout':0.5,
-        'inner_dropout':0.1,'dense_size':64,'final_activation':'sigmoid','double_conv':False} 
+                'inner_dropout':0.1,'dense_size':64,'final_activation':'sigmoid','double_conv':False} 
         
-    elif name=='2': # Simple layered, without inner dropout
+    elif name=='2':
         model_par_dict={'conv_size_list':[10,10,10],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False, 'learn_rate':0.001, 'outer_dropout':0.5,
         'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':False} 
 
-    elif name=='3': # More layers
+    elif name=='3':
+        model_par_dict={'conv_size_list':[20,20,20,20],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False, 'learn_rate':0.001, 'outer_dropout':None,
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':False} 
+        
+    elif name=='4':
+        model_par_dict={'conv_size_list':[64,64,64,64,64],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False, 'learn_rate':0.001, 'outer_dropout':0.5,
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':False} 
+
+    elif name=='5':
+        model_par_dict={'conv_size_list':[30,30,30,30,40],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False, 'learn_rate':0.001, 'outer_dropout':None,
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':False} 
+
+    elif name=='6':
+        model_par_dict={'conv_size_list':[60,60],'kernel_size':(3,3),'pool_size':(4,4), 'strides':1, 'no_pool':False, 'learn_rate':0.001, 'outer_dropout':None,
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':False}
+      
+    elif name=='7':
+        model_par_dict={'conv_size_list':[128,256,256],'kernel_size':(3,3),'pool_size':(4,4), 'strides':1, 'no_pool':False, 'learn_rate':0.001, 'outer_dropout':0.5,
+        'inner_dropout':0.8,'dense_size':64,'final_activation':'sigmoid','double_conv':False}
+      
+    elif name=='8':
+        model_par_dict={'conv_size_list':[10,10,10],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False, 'learn_rate':0.001, 'outer_dropout':None,
+        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':True}
+    elif name=='9':
         model_par_dict={'conv_size_list':[64,64,64,64],'kernel_size':(3,3),'pool_size':(2,2), 'strides':1, 'no_pool':False, 'learn_rate':0.001, 'outer_dropout':0.5,
         'inner_dropout':0.5,'dense_size':64,'final_activation':'sigmoid','double_conv':True}
 
     ### Strides instead of pools
-    elif name=='10': # Striding 
+    elif name=='14':
+        model_par_dict={'conv_size_list':[128,128,128,128],'kernel_size':(3,3),'pool_size':(2,2), 'strides':[1,2,2,1], 'no_pool':True, 'learn_rate':0.001, 'outer_dropout':0.5,
+        'inner_dropout':0.7,'dense_size':64,'final_activation':'sigmoid','double_conv':True}
+        
+    elif name=='15':
+        model_par_dict={'conv_size_list':[128,128,256,256],'kernel_size':(3,3),'pool_size':(2,2), 'strides':[1,2,3,1], 'no_pool':True, 'learn_rate':0.001, 'outer_dropout':0.8,
+        'inner_dropout':0.5,'dense_size':64,'final_activation':'sigmoid','double_conv':True}
+        
+    elif name=='16':
         model_par_dict={'conv_size_list':[128,128,64,64],'kernel_size':(3,3),'pool_size':(2,2), 'strides':[1,2,3,4], 'no_pool':True, 'learn_rate':0.001, 'outer_dropout':0.2,
         'inner_dropout':0.5,'dense_size':64,'final_activation':'sigmoid','double_conv':True}
-    elif name=='11': # Striding 
-        model_par_dict={'conv_size_list':[128,128,64,64],'kernel_size':(3,3),'pool_size':(2,2), 'strides':[1,2,3,4], 'no_pool':True, 'learn_rate':0.001, 'outer_dropout':0.2,
-        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':True}
-    elif name=='12': # Striding 
-        model_par_dict={'conv_size_list':[64,64,32,32],'kernel_size':(3,3),'pool_size':(2,2), 'strides':[1,2,3,4], 'no_pool':True, 'learn_rate':0.001, 'outer_dropout':0.2,
-        'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':True}
-
+     
      ### A custom layered cnn is name=0
     elif name=='0': 
         custom_model=True
-        learn_rate=0.001 
+        
         inputs = layers.Input(shape=shape)
         h = inputs
         # Convolutional layers     
@@ -109,18 +134,17 @@ def f_define_model(config_dict,name='1'):
     elif name=='20': # Resnet 50
         inputs = layers.Input(shape=shape)
         model = ResNet50(img_input=inputs)
-        learn_rate=0.0005
+        learn_rate=0.0001
         resnet=True
-    
+
     elif name=='21': # Resnet 50
         inputs = layers.Input(shape=shape)
         model = ResNet18(img_input=inputs)
-        learn_rate=0.0005
+        learn_rate=0.0001
         resnet=True
 
     elif name=='30':  # Model used in ATLAS paper
         custom_model=True
-        learn_rate=0.001 
         
         inputs = layers.Input(shape=shape)
         h = inputs
@@ -136,6 +160,7 @@ def f_define_model(config_dict,name='1'):
         # Ouptut layer
         outputs = layers.Dense(1, activation='sigmoid')(h)
     
+
     ############################################
     ### Add more models above
     ############################################
@@ -147,7 +172,7 @@ def f_define_model(config_dict,name='1'):
         opt,loss_fn=optimizers.Adam(lr=learn_rate),'sparse_categorical_crossentropy'
     
     else : ## For non resnet models 
-        if not custom_model:  ### For non-custom models, use prototype function
+        if name not in ['0','30']:  ### For non-custom models, use prototype function
             outputs,inputs=f_model_prototype(shape,**model_par_dict)
             learn_rate=model_par_dict['learn_rate']    
         model = models.Model(inputs, outputs)
@@ -155,6 +180,7 @@ def f_define_model(config_dict,name='1'):
     
     model.compile(optimizer=opt, loss=loss_fn, metrics=metrics)
     #print("model %s"%name)
+    #model.summary()
 
     return model
 
