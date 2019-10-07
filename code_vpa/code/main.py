@@ -72,13 +72,11 @@ if __name__=='__main__':
     print("Train data shape",train_x.shape,train_y.shape,train_wts.shape)
 
 
-    '''
     ### Reading validation data 
     filename=data_dir+'val.h5'
     val_data_dict=f_get_data(filename)
     val_x,val_y,val_wts=val_data_dict['images'],val_data_dict['labels'],val_data_dict['weights']
-    print("Validation data shape",val_x.shape,val_y.shape,val_wts.shape)
-    '''
+    print("Using validation data from %s. Validation data shape"%(filename),val_x.shape,val_y.shape,val_wts.shape)
 
     t2=time.time()
     print("Time taken to read files",t2-t1)
@@ -98,7 +96,7 @@ if __name__=='__main__':
         if args.train: # If model hasn't been trained, train and save files
             
             ### Train model ###
-            history=f_train_model(model,train_x,train_y,model_weights=model_save_dir+fname_model_wts,num_epochs=num_epochs,batch_size=batch_size,val_x=None,val_y=None)
+            history=f_train_model(model,train_x,train_y,model_weights=model_save_dir+fname_model_wts,num_epochs=num_epochs,batch_size=batch_size,val_x=val_x,val_y=val_y)
  
             ### Save model and history ###
             fname_model,fname_history='model_{0}.h5'.format(model_name),'history_{0}.pickle'.format(model_name)

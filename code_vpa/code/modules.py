@@ -60,8 +60,8 @@ def f_train_model(model,inpx,inpy,model_weights,num_epochs=5,batch_size=64,val_x
                     verbose=1,
                     callbacks = [callbacks.EarlyStopping(monitor='val_loss', patience=40, verbose=1),
                                  callbacks.ModelCheckpoint(model_weights, save_best_only=True, monitor='val_loss', mode='min') ],
-                    validation_split=cv_fraction,
-                    #validation_data=(val_x,val_y),
+                    #validation_split=cv_fraction,
+                    validation_data=(val_x,val_y),
                     shuffle=True
                 )
     
