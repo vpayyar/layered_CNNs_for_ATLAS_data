@@ -71,18 +71,48 @@ def f_define_model(config_dict,name='1'):
         'inner_dropout':0.5,'dense_size':64,'final_activation':'sigmoid','double_conv':True}
 
     ### Strides instead of pools
-    elif name=='10': # Striding 
+    elif name=='4': # Striding 
         model_par_dict={'conv_size_list':[128,128,64,64],'kernel_size':(3,3),'pool_size':(2,2), 'strides':[1,2,3,4], 'no_pool':True, 'learn_rate':0.001, 'outer_dropout':0.2,
         'inner_dropout':0.5,'dense_size':64,'final_activation':'sigmoid','double_conv':True}
-    elif name=='11': # Striding 
+    elif name=='5': # Striding 
         model_par_dict={'conv_size_list':[128,128,64,64],'kernel_size':(3,3),'pool_size':(2,2), 'strides':[1,2,3,4], 'no_pool':True, 'learn_rate':0.001, 'outer_dropout':0.2,
         'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':True}
-    elif name=='12': # Striding 
+    elif name=='6': # Striding 
         model_par_dict={'conv_size_list':[64,64,32,32],'kernel_size':(3,3),'pool_size':(2,2), 'strides':[1,2,3,4], 'no_pool':True, 'learn_rate':0.001, 'outer_dropout':0.2,
         'inner_dropout':None,'dense_size':64,'final_activation':'sigmoid','double_conv':True}
 
-     ### A custom layered cnn is name=0
-    elif name=='0': 
+    elif name=='0':  # Model used in ATLAS paper
+        custom_model=True
+        learn_rate=0.001 
+        
+        inputs = layers.Input(shape=shape)
+        h = inputs
+        # Convolutional layers
+        h = Conv2D(64, kernel_size=(3, 3), activation='relu', strides=1, padding='same')(h)
+        h = Conv2D(128, kernel_size=(3, 3), activation='relu', strides=2, padding='same')(h)
+        h = Conv2D(256, kernel_size=(3, 3), activation='relu', strides=1, padding='same')(h)
+        h = Conv2D(256, kernel_size=(3, 3), activation='relu', strides=2, padding='same')(h)
+        h = Flatten()(h)
+        h = Dense(512, activation='relu')(h)
+        y = Dense(1, activation='sigmoid')(h)
+
+        # Ouptut layer
+        outputs = layers.Dense(1, activation='sigmoid')(h)
+       
+    elif name=='10': # Resnet 50
+        inputs = layers.Input(shape=shape)
+        model = ResNet50(img_input=inputs)
+        learn_rate=0.0005
+        resnet=True
+    
+    elif name=='11': # Resnet 50
+        inputs = layers.Input(shape=shape)
+        model = ResNet18(img_input=inputs)
+        learn_rate=0.0005
+        resnet=True
+
+    ### A custom layered cnn is name=0
+    elif name=='30': 
         custom_model=True
         learn_rate=0.001 
         inputs = layers.Input(shape=shape)
@@ -102,36 +132,6 @@ def f_define_model(config_dict,name='1'):
         # Fully connected  layers
         h = layers.Dense(64, activation='relu')(h)
         h = layers.Dropout(rate=0.5)(h)
-
-        # Ouptut layer
-        outputs = layers.Dense(1, activation='sigmoid')(h)
-        
-    elif name=='20': # Resnet 50
-        inputs = layers.Input(shape=shape)
-        model = ResNet50(img_input=inputs)
-        learn_rate=0.0005
-        resnet=True
-    
-    elif name=='21': # Resnet 50
-        inputs = layers.Input(shape=shape)
-        model = ResNet18(img_input=inputs)
-        learn_rate=0.0005
-        resnet=True
-
-    elif name=='30':  # Model used in ATLAS paper
-        custom_model=True
-        learn_rate=0.001 
-        
-        inputs = layers.Input(shape=shape)
-        h = inputs
-        # Convolutional layers
-        h = Conv2D(64, kernel_size=(3, 3), activation='relu', strides=1, padding='same')(h)
-        h = Conv2D(128, kernel_size=(3, 3), activation='relu', strides=2, padding='same')(h)
-        h = Conv2D(256, kernel_size=(3, 3), activation='relu', strides=1, padding='same')(h)
-        h = Conv2D(256, kernel_size=(3, 3), activation='relu', strides=2, padding='same')(h)
-        h = Flatten()(h)
-        h = Dense(512, activation='relu')(h)
-        y = Dense(1, activation='sigmoid')(h)
 
         # Ouptut layer
         outputs = layers.Dense(1, activation='sigmoid')(h)

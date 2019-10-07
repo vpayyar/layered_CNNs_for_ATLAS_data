@@ -46,19 +46,22 @@ def f_get_data(filename):
     return values_dict
 
 
-def f_train_model(model,inpx,inpy,model_weights,num_epochs=5,batch_size=64):
+def f_train_model(model,inpx,inpy,model_weights,num_epochs=5,batch_size=64,val_x=None,val_y=None):
     '''
     Train model. Returns just history.history
     '''
-    cv_fraction=0.33 # Fraction of data for cross validation
+    if val_x is None or val_y is None: 
+        cv_fraction=0.33 # Fraction of data for cross validation
+        print("Using {0} % of training data as validation".format(cv_fraction))
     
     history=model.fit(x=inpx, y=inpy,
                     batch_size=batch_size,
                     epochs=num_epochs,
                     verbose=1,
-                    callbacks = [callbacks.EarlyStopping(monitor='val_loss', min_delta=0,patience=20, verbose=1),
+                    callbacks = [callbacks.EarlyStopping(monitor='val_loss', patience=40, verbose=1),
                                  callbacks.ModelCheckpoint(model_weights, save_best_only=True, monitor='val_loss', mode='min') ],
                     validation_split=cv_fraction,
+                    #validation_data=(val_x,val_y),
                     shuffle=True
                 )
     
